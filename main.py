@@ -19,7 +19,7 @@ def run():
 
     try:
         #Get Status of Exchange & Account
-        print("\nExchange Status: \n\n")
+        print("List of available exchanges: \n\n")
         print(ccxt.exchanges)
 
     except():
