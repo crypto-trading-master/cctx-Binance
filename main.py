@@ -1,11 +1,17 @@
 import ccxt
+from pprint import pprint
 import time
+import secret
 #import save_historical_data_Roibal
 
-#from Keys import Key1
+
 
 def run():
-    # get system status
+    initialize()
+    
+
+def initialize():
+
     #Create List of Crypto Pairs to Watch
     list_of_symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT','BNBBTC', 'ETHBTC', 'LTCBTC']
     micro_cap_coins = ['ICXBNB', 'BRDBNB', 'NAVBNB', 'RCNBNB']
@@ -19,12 +25,31 @@ def run():
 
     try:
         #Get Status of Exchange & Account
-        print("List of available exchanges: \n\n")
-        print(ccxt.exchanges)
+        print("Number of Exchanges: ", len(ccxt.exchanges))
+        #print("List of available exchanges: \n\n")
+        #print(ccxt.exchanges)
+
+        binance = ccxt.binance({
+            'apiKey': secret.API_KEY,
+            'secret': secret.SECRET,
+        })
+
+        markets = binance.load_markets()
+        symbols = binance.symbols
+        currencies = binance.currencies
+        balances = binance.fetchBalance()
+
+        print("Exchange: ", binance.id)
+        print("Exchange limits: ", binance.rateLimit)
+        print("Number of Markets: ", len(markets))
+        print("Number of Symbols: ", len(symbols))
+        print("Number of Currencies: ", len(currencies))
+        pprint(balances)
+        
+        
 
     except():
          print("\n \n \nATTENTION: NON-VALID CCTX CONNECTION \n \n \n")        
-    
     
 if __name__ == "__main__":
     run()
