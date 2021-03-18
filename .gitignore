@@ -139,3 +139,5 @@ cython_debug/
 
 # Secret keys
 secret.py
+config.py
+config.json

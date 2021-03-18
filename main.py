@@ -1,16 +1,16 @@
 import ccxt
 from pprint import pprint
 import time
-import secret
-#import save_historical_data_Roibal
-
-
+import json
 
 def run():
     initialize()
     
 
 def initialize():
+
+    with open('config.json', 'r') as f:
+        config = json.load(f)
 
     #Create List of Crypto Pairs to Watch
     list_of_symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT','BNBBTC', 'ETHBTC', 'LTCBTC']
@@ -30,8 +30,8 @@ def initialize():
         #print(ccxt.exchanges)
 
         binance = ccxt.binance({
-            'apiKey': secret.API_KEY,
-            'secret': secret.SECRET,
+            'apiKey': config['apiKey'],
+            'secret': config['secret']
         })
 
         markets = binance.load_markets()
@@ -44,9 +44,7 @@ def initialize():
         print("Number of Markets: ", len(markets))
         print("Number of Symbols: ", len(symbols))
         print("Number of Currencies: ", len(currencies))
-        pprint(balances)
-        
-        
+        #pprint(balances)            
 
     except():
          print("\n \n \nATTENTION: NON-VALID CCTX CONNECTION \n \n \n")        
