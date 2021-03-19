@@ -5,7 +5,7 @@ import json
 
 def run():
     initialize()
-    
+
 
 def initialize():
 
@@ -20,7 +20,7 @@ def initialize():
     print("\n\n---------------------------------------------------------\n\n")
     print("Hello and Welcome to the Crypto Trader Bot Python Script")
     print("\n\n---------------------------------------------------------\n\n")
-    
+
     #time.sleep(5)
 
     try:
@@ -46,7 +46,7 @@ def initialize():
         #print("Number of Markets: ", len(markets))
         #print("Number of Symbols: ", len(symbols))
         #print("Number of Currencies: ", len(currencies))
-        #pprint(balances)            
+        #pprint(balances)
 
         # Find Trading Pairs for base currencies
 
@@ -56,23 +56,23 @@ def initialize():
             for coin in coins:
                 if coin in symbol:
                     pairs.append(symbol)
-        
+
         #print(pairs)
 
         # From coin 1 to coin 2 Bid
-        # From coin 2 to coin 3 Ask        
+        # From coin 2 to coin 3 Ask
         # From coin 3 to coin 1 Bid
 
         arb_list = ['ETH/BTC', 'LTC/ETH', 'LTC/BTC']
 
         for sym in arb_list:
-            depth = binance.fetch_order_book(symbol = sym)
+            depth = binance.fetch_order_book(sym)
             pprint(depth)
-        
+
 
     except():
-         print("\n \n \nATTENTION: NON-VALID CCTX CONNECTION \n \n \n")        
-    
+         print("\n \n \nATTENTION: NON-VALID CCTX CONNECTION \n \n \n")
+
 def arbitrage():
     pass
 
