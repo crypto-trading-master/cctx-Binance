@@ -12,63 +12,106 @@ def initialize():
     with open('config.json', 'r') as f:
         config = json.load(f)
 
-    #Create List of Crypto Pairs to Watch
-    list_of_symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT','BNBBTC', 'ETHBTC', 'LTCBTC']
-    micro_cap_coins = ['ICXBNB', 'BRDBNB', 'NAVBNB', 'RCNBNB']
-    #time_horizon = "Short"
-    #Risk = "High"
     print("\n\n---------------------------------------------------------\n\n")
     print("Hello and Welcome to the Crypto Trader Bot Python Script")
     print("\n\n---------------------------------------------------------\n\n")
 
-    #time.sleep(5)
-
     try:
-        #Get Status of Exchange & Account
-        #print("Number of Exchanges: ", len(ccxt.exchanges))
-        #print("List of available exchanges: \n\n")
-        #print(ccxt.exchanges)
-
-        binance = ccxt.binance({
+        exchange = ccxt.binance({
             'apiKey': config['apiKey'],
             'secret': config['secret']
         })
 
-        coins = ['BTC']
+        baseCoin = config['baseCoin']
 
-        markets = binance.load_markets()
-        symbols = binance.symbols
-        currencies = binance.currencies
-        balances = binance.fetchBalance()
+        markets = exchange.load_markets()
+        symbols = exchange.symbols
+        #currencies = exchange.currencies
+        #balances = exchange.fetchBalance()
 
-        #print("Exchange: ", binance.id)
-        #print("Exchange limits: ", binance.rateLimit)
-        #print("Number of Markets: ", len(markets))
-        #print("Number of Symbols: ", len(symbols))
-        #print("Number of Currencies: ", len(currencies))
-        #pprint(balances)
+        # Find Trading Pairs for base coin
 
-        # Find Trading Pairs for base currencies
+        print("Generating triples...\n")
 
-        pairs = []
+        basePairs = []
+        coinsBetween = []
 
         for symbol in symbols:
+
+            ####  Exact match neccessary !!!  -> Move to function ???
+
+            if baseCoin in symbol:
+                basePairs.append(symbol)
+
+        print("Base pairs:\n")
+        pprint(basePairs)
+
+        # Find between trading pairs
+
+        for pair in basePairs:
+            coins = pair.split("/")
             for coin in coins:
-                if coin in symbol:
-                    pairs.append(symbol)
+                if coin not in coinsBetween:
+                    coinsBetween.append(coin)
+        
+        #print("Between pair Coins:\n")
+        #pprint(coinsBetween)
 
-        #print(pairs)
+        # Check if between pair exists
 
-        # From coin 1 to coin 2 Bid
-        # From coin 2 to coin 3 Ask
-        # From coin 3 to coin 1 Bid
+        pairsBetween = []
+        coinsBetween2 = coinsBetween
 
+        for baseCoinBetween in coinsBetween:
+            for qouteCoinBetween in coinsBetween2:
+                pair = baseCoinBetween + "/" + qouteCoinBetween
+                if pair in symbols:
+                    pairsBetween.append(pair)
+
+        #print("Between pairs:\n")
+        #pprint(pairsBetween)
+        
+        # Find triples for base coin
+
+        triples = []
+        basePairs2 = basePairs
+
+        for pair in basePairs:
+            
+            # Find last Pair
+            for pair2 in basePairs2:
+                if pair2 != pair:
+                    lastPair = pair2                    
+
+                    # Find pair in between
+                    baseCoinsBetween = pair.split("/")
+                    quoteCoinsBetween = lastPair.split("/")
+                    for baseCoinBetween in baseCoinsBetween:
+                        if baseCoinBetween != baseCoin:
+                            for quoteCoinBetween in quoteCoinsBetween:
+                                if quoteCoinBetween != baseCoin:
+                                    betweenPair = baseCoinBetween + "/" + quoteCoinBetween
+                                    if betweenPair in symbols:
+                                        triple = []
+                                        triple.append(pair)
+                                        triple.append(betweenPair)
+                                        triple.append(lastPair)
+                                        # Add triple to array of triples
+                                        triples.append(triple)        
+        
+        print("Number of Triples: ", len(triples))
+        #pprint(triples)
+
+        '''
         arb_list = ['ETH/BTC', 'LTC/ETH', 'LTC/BTC']
-
+        
         for sym in arb_list:
-            depth = binance.fetch_order_book(sym)
-            pprint(depth)
-
+            depth = exchange.fetch_order_book(sym)
+            bid = depth['bids'][0][0]
+            ask = depth['asks'][0][0]
+            print(sym, " Bid:", bid)
+            print(sym, " Ask:", ask)
+        '''
 
     except():
          print("\n \n \nATTENTION: NON-VALID CCTX CONNECTION \n \n \n")
