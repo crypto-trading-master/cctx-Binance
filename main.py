@@ -16,18 +16,21 @@ def initialize():
     print("Hello and Welcome to the Crypto Trader Bot Python Script")
     print("\n\n---------------------------------------------------------\n\n")
 
-    try:
+    try:        
         exchange = ccxt.binance({
             'apiKey': config['apiKey'],
             'secret': config['secret']
         })
 
+        global baseCoin 
         baseCoin = config['baseCoin']
 
         markets = exchange.load_markets()
-        symbols = exchange.symbols
+        #symbols = exchange.symbols
         #currencies = exchange.currencies
         #balances = exchange.fetchBalance()
+        
+        #pprint(markets['ZRX/USDT'])
 
         # Find Trading Pairs for base coin
 
@@ -35,16 +38,18 @@ def initialize():
 
         basePairs = []
         coinsBetween = []
+        allPairs = []
+        
+        ##### How to filter out UP / DOWN pairs ???
 
-        for symbol in symbols:
+        for pair, value in markets.items():
+            allPairs.append(pair)
 
-            ####  Exact match neccessary !!!  -> Move to function ???
+            if isBaseCoinPair(pair,value):
+                basePairs.append(pair)        
 
-            if baseCoin in symbol:
-                basePairs.append(symbol)
-
-        print("Base pairs:\n")
-        pprint(basePairs)
+        #print("Base pairs:\n")
+        #pprint(basePairs)
 
         # Find between trading pairs
 
@@ -52,7 +57,7 @@ def initialize():
             coins = pair.split("/")
             for coin in coins:
                 if coin not in coinsBetween:
-                    coinsBetween.append(coin)
+                    coinsBetween.append(coin)        
         
         #print("Between pair Coins:\n")
         #pprint(coinsBetween)
@@ -65,7 +70,7 @@ def initialize():
         for baseCoinBetween in coinsBetween:
             for qouteCoinBetween in coinsBetween2:
                 pair = baseCoinBetween + "/" + qouteCoinBetween
-                if pair in symbols:
+                if pair in allPairs:
                     pairsBetween.append(pair)
 
         #print("Between pairs:\n")
@@ -91,7 +96,7 @@ def initialize():
                             for quoteCoinBetween in quoteCoinsBetween:
                                 if quoteCoinBetween != baseCoin:
                                     betweenPair = baseCoinBetween + "/" + quoteCoinBetween
-                                    if betweenPair in symbols:
+                                    if betweenPair in allPairs:
                                         triple = []
                                         triple.append(pair)
                                         triple.append(betweenPair)
@@ -118,6 +123,13 @@ def initialize():
 
 def arbitrage():
     pass
+
+def isBaseCoinPair(pair,value):
+    if value['type'] == 'spot':
+        coins = pair.split("/")
+        for coin in coins:
+            if coin == baseCoin:
+                return True
 
 if __name__ == "__main__":
     run()

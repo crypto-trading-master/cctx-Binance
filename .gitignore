@@ -141,3 +141,6 @@ cython_debug/
 secret.py
 config.py
 config.json
+
+# Repl.it
+.replit
