@@ -7,22 +7,30 @@ def run():
     initialize()
 
 
-def initialize():
-
-    with open('config.json', 'r') as f:
-        config = json.load(f)
+def initialize():    
 
     print("\n\n---------------------------------------------------------\n\n")
-    print("Hello and Welcome to the Crypto Trader Bot Python Script")
+    print("Welcome to Arbitr8 Bot")
     print("\n\n---------------------------------------------------------\n\n")
 
     try:        
+
+        global baseCoin, exchange, triplePairs, marketPrices
+
+        with open('config.json', 'r') as f:
+            config = json.load(f)
+
         exchange = ccxt.binance({
             'apiKey': config['apiKey'],
             'secret': config['secret']
-        })
+        })        
 
-        global baseCoin 
+        basePairs = []
+        coinsBetween = []
+        allPairs = []
+        triplePairs = []
+        marketPrices = {}
+
         baseCoin = config['baseCoin']
 
         markets = exchange.load_markets()
@@ -34,14 +42,8 @@ def initialize():
 
         # Find Trading Pairs for base coin
 
-        print("Generating triples...\n")
-
-        basePairs = []
-        coinsBetween = []
-        allPairs = []
-        
-        ##### How to filter out UP / DOWN pairs ???
-
+        print("Generating triples...\n")        
+                
         for pair, value in markets.items():
             allPairs.append(pair)
 
@@ -99,16 +101,22 @@ def initialize():
                                     if betweenPair in allPairs:
                                         triple = []
                                         triple.append(pair)
+                                        addTriplePair(pair)
                                         triple.append(betweenPair)
+                                        addTriplePair(betweenPair)
                                         triple.append(lastPair)
+                                        addTriplePair(lastPair)
                                         # Add triple to array of triples
                                         triples.append(triple)        
         
         print("Number of Triples: ", len(triples))
-        #pprint(triples)
+        print("Number of Triple Pairs: ",len(triplePairs))
+
+        calcArbitrage()
+        
 
         '''
-        arb_list = ['ETH/BTC', 'LTC/ETH', 'LTC/BTC']
+        
         
         for sym in arb_list:
             depth = exchange.fetch_order_book(sym)
@@ -121,8 +129,18 @@ def initialize():
     except():
          print("\n \n \nATTENTION: NON-VALID CCTX CONNECTION \n \n \n")
 
-def arbitrage():
-    pass
+def calcArbitrage():
+
+    print("Calculate current market prices...")
+
+    for pair in triplePairs:
+        depth = exchange.fetch_order_book(pair)
+        bid = depth['bids'][0][0]
+        ask = depth['asks'][0][0]
+        marketPrices[pair] = {}
+        marketPrices[pair]['bid'] = bid
+        marketPrices[pair]['ask'] = ask
+
 
 def isBaseCoinPair(pair,value):
     if value['type'] == 'spot':
@@ -130,6 +148,10 @@ def isBaseCoinPair(pair,value):
         for coin in coins:
             if coin == baseCoin:
                 return True
+
+def addTriplePair(pair)     :
+    if pair not in triplePairs:
+        triplePairs.append(pair)           
 
 if __name__ == "__main__":
     run()
