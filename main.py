@@ -49,8 +49,8 @@ def initialize():
                 if isBaseCoinPair(pair):
                     basePairs.append(pair)
 
-        print("\nNumber of valid market pairs: ",len(allPairs))
-        print("\nNumber of base coin pairs: ",len(basePairs))
+        print("Number of valid market pairs: ",len(allPairs))
+        print("Number of base coin pairs: ",len(basePairs))
 
         # Find between trading pairs
 
@@ -128,7 +128,7 @@ def isSpotPair(value):
     return value['type'] == 'spot'
 
 
-def isActiveMarket(value):    
+def isActiveMarket(value):
     return value['info']['status'] == 'TRADING'
 
 
@@ -145,4 +145,3 @@ def addTriplePair(pair):
 
 if __name__ == "__main__":
     run()
-    #test()
