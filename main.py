@@ -15,7 +15,7 @@ def initialize():
 
     try:
 
-        global baseCoin, exchange, triplePairs, marketPrices
+        global baseCoin, exchange, triplePairs
 
         with open('config.json', 'r') as f:
             config = json.load(f)
@@ -29,15 +29,16 @@ def initialize():
         coinsBetween = []
         allPairs = []
         triplePairs = []
-        marketPrices = {}
 
         baseCoin = config['baseCoin']
+
+        print("Base coin:", baseCoin)
 
         markets = exchange.load_markets()
 
         # Find Trading Pairs for base coin
 
-        print("Generating triples...\n")
+        print("\n\nGenerating triples...\n")
 
         ####### Write valid pairs to file for reuse ? ###########
 
@@ -49,8 +50,8 @@ def initialize():
                 if isBaseCoinPair(pair):
                     basePairs.append(pair)
 
-        print("Number of valid market pairs: ",len(allPairs))
-        print("Number of base coin pairs: ",len(basePairs))
+        print("Number of valid market pairs:",len(allPairs))
+        print("Number of base coin pairs:",len(basePairs))
 
         # Find between trading pairs
 
@@ -102,10 +103,10 @@ def initialize():
                                         # Add triple to array of triples
                                         triples.append(triple)
 
-        print("Number of Triples: ", len(triples))
-        print("Number of Triple Pairs: ",len(triplePairs))
+        print("Number of Triples:", len(triples))
+        print("Number of Triple Pairs:",len(triplePairs))
 
-        #calcArbitrage()
+        calcArbitrage()
 
     except():
          print("\n \n \nATTENTION: NON-VALID CCTX CONNECTION \n \n \n")
@@ -113,18 +114,24 @@ def initialize():
 
 def calcArbitrage():
 
-    print("Calculate current market prices...")
+    print("\n\nCalculate current market prices...")
 
-    ####  fetchTickers !!!!!
+    exchange.load_markets(True)
+    tickers = exchange.fetch_tickers(triplePairs)
+
+    for triple in triples:
+        for i in range(0,2):
+            prices = []
+            prices[i] = tickers[triple[i]]['last']
+
+
+    return
 
     for pair in triplePairs:
-        depth = exchange.fetch_order_book(pair)
-        bid = depth['bids'][0][0]
-        ask = depth['asks'][0][0]
-        marketPrices[pair] = {}
-        marketPrices[pair]['bid'] = bid
-        marketPrices[pair]['ask'] = ask
+        ask = tickers[pair]['ask']
+        bid = tickers[pair]['bid']
 
+    print("Number of Tickers:",len(tickers))
 
 def isSpotPair(value):
     return value['type'] == 'spot'
