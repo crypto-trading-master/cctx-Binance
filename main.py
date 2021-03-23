@@ -115,6 +115,8 @@ def calcArbitrage():
 
     print("Calculate current market prices...")
 
+    ####  fetchTickers !!!!!
+
     for pair in triplePairs:
         depth = exchange.fetch_order_book(pair)
         bid = depth['bids'][0][0]
