@@ -35,7 +35,6 @@ def initialize():
 
         markets = exchange.load_markets()
 
-
         # Find Trading Pairs for base coin
 
         print("Generating triples...\n")
@@ -101,20 +100,9 @@ def initialize():
 
         calcArbitrage()
 
-
-        '''
-
-
-        for sym in arb_list:
-            depth = exchange.fetch_order_book(sym)
-            bid = depth['bids'][0][0]
-            ask = depth['asks'][0][0]
-            print(sym, " Bid:", bid)
-            print(sym, " Ask:", ask)
-        '''
-
     except():
          print("\n \n \nATTENTION: NON-VALID CCTX CONNECTION \n \n \n")
+
 
 def calcArbitrage():
 
@@ -128,8 +116,15 @@ def calcArbitrage():
         marketPrices[pair]['bid'] = bid
         marketPrices[pair]['ask'] = ask
 
+
 def isSpotPair(value):
     return value['type'] == 'spot'
+
+
+def hasMarketDepth(pair):
+    depth = exchange.fetch_order_book(pair)
+    return len(depth['asks']) > 0
+
 
 def isBaseCoinPair(pair):
     coins = pair.split("/")
@@ -137,13 +132,11 @@ def isBaseCoinPair(pair):
         if coin == baseCoin:
             return True
 
+
 def addTriplePair(pair):
     if pair not in triplePairs:
         triplePairs.append(pair)
 
-def hasMarketDepth(pair):
-    depth = exchange.fetch_order_book(pair)
-    return len(depth['asks']) > 0
 
 def test():
     marketPrices = {}
