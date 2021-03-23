@@ -149,9 +149,30 @@ def isBaseCoinPair(pair,value):
             if coin == baseCoin:
                 return True
 
-def addTriplePair(pair)     :
+def addTriplePair(pair):
+    pass
+    '''
     if pair not in triplePairs:
-        triplePairs.append(pair)           
+        triplePairs.append(pair)
+    '''
+
+def test():
+    marketPrices = {}
+    exchange = ccxt.binance()
+    markets = exchange.load_markets()
+    symbols = exchange.symbols
+    for pair in symbols:    
+        print(pair)
+        depth = exchange.fetch_order_book(pair)
+        bid = depth['bids'][0][0]
+        ask = depth['asks'][0][0]        
+        marketPrices[pair] = {}
+        marketPrices[pair]['bid'] = bid
+        marketPrices[pair]['ask'] = ask
+        print(pair, " Bid:", marketPrices[pair]['bid'])
+        print(pair, "Ask:", marketPrices[pair]['ask'])
+
 
 if __name__ == "__main__":
-    run()
+    #run()
+    test()
