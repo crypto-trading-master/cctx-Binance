@@ -39,11 +39,18 @@ def initialize():
 
         print("Generating triples...\n")
 
+        ####### Write valid pairs to file for reuse ? ###########
+
+        ####### How to get valid market info from market dict ?? ########
+
         for pair, value in markets.items():
-            if hasMarketDepth(pair) && isSpotPair(pair):
+            if isActiveMarket(value) and isSpotPair(value):
                 allPairs.append(pair)
-                if isBaseCoinPair(pair,value):
+                if isBaseCoinPair(pair):
                     basePairs.append(pair)
+
+        print("\nNumber of valid market pairs: ",len(allPairs))
+        print("\nNumber of base coin pairs: ",len(basePairs))
 
         # Find between trading pairs
 
@@ -98,7 +105,7 @@ def initialize():
         print("Number of Triples: ", len(triples))
         print("Number of Triple Pairs: ",len(triplePairs))
 
-        calcArbitrage()
+        #calcArbitrage()
 
     except():
          print("\n \n \nATTENTION: NON-VALID CCTX CONNECTION \n \n \n")
@@ -121,9 +128,8 @@ def isSpotPair(value):
     return value['type'] == 'spot'
 
 
-def hasMarketDepth(pair):
-    depth = exchange.fetch_order_book(pair)
-    return len(depth['asks']) > 0
+def isActiveMarket(value):    
+    return value['info']['status'] == 'TRADING'
 
 
 def isBaseCoinPair(pair):
@@ -137,33 +143,6 @@ def addTriplePair(pair):
     if pair not in triplePairs:
         triplePairs.append(pair)
 
-
-def test():
-    marketPrices = {}
-    global exchange
-    exchange = ccxt.binance()
-    markets = exchange.load_markets()
-    symbols = exchange.symbols
-    #pair = 'AAVE/BKRW'
-    pair = 'BTC/USDT'
-    #for pair in symbols:
-    print(pair)
-    depth = exchange.fetch_order_book(pair)
-    pprint(depth)
-
-    print(hasMarketDepth(pair))
-
-    return
-    ask = depth['asks'][0][0]
-    bid = depth['bids'][0][0]
-
-    marketPrices[pair] = {}
-    marketPrices[pair]['bid'] = bid
-    marketPrices[pair]['ask'] = ask
-    print(pair, " Bid:", marketPrices[pair]['bid'])
-    print(pair, "Ask:", marketPrices[pair]['ask'])
-
-
 if __name__ == "__main__":
-    #run()
-    test()
+    run()
+    #test()
