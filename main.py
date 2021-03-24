@@ -3,6 +3,7 @@ from pprint import pprint
 import time
 import json
 
+
 def run():
     initialize()
 
@@ -15,7 +16,7 @@ def initialize():
 
     try:
 
-        global baseCoin, exchange, triplePairs
+        global baseCoin, exchange, triplePairs, triples
 
         with open('config.json', 'r') as f:
             config = json.load(f)
@@ -40,18 +41,14 @@ def initialize():
 
         print("\n\nGenerating triples...\n")
 
-        ####### Write valid pairs to file for reuse ? ###########
-
-        ####### How to get valid market info from market dict ?? ########
-
         for pair, value in markets.items():
             if isActiveMarket(value) and isSpotPair(value):
                 allPairs.append(pair)
                 if isBaseCoinPair(pair):
                     basePairs.append(pair)
 
-        print("Number of valid market pairs:",len(allPairs))
-        print("Number of base coin pairs:",len(basePairs))
+        print("Number of valid market pairs:", len(allPairs))
+        print("Number of base coin pairs:", len(basePairs))
 
         # Find between trading pairs
 
@@ -104,12 +101,12 @@ def initialize():
                                         triples.append(triple)
 
         print("Number of Triples:", len(triples))
-        print("Number of Triple Pairs:",len(triplePairs))
+        print("Number of Triple Pairs:", len(triplePairs))
 
         calcArbitrage()
 
     except():
-         print("\n \n \nATTENTION: NON-VALID CCTX CONNECTION \n \n \n")
+        print("\n \n \nATTENTION: NON-VALID CCTX CONNECTION \n \n \n")
 
 
 def calcArbitrage():
@@ -120,18 +117,47 @@ def calcArbitrage():
     tickers = exchange.fetch_tickers(triplePairs)
 
     for triple in triples:
-        for i in range(0,2):
-            prices = []
-            prices[i] = tickers[triple[i]]['last']
+        i = 0
+        coinAmount = 0
+        transferCoin = ''
+        profit = 0
 
+        pprint(triple)
 
-    return
+        for pair in triple:
+            i += 1
+            ticker = tickers[pair]
 
-    for pair in triplePairs:
-        ask = tickers[pair]['ask']
-        bid = tickers[pair]['bid']
+            if i == 1:
+                if coinIsPairBaseCoin(baseCoin, pair):
+                    # Sell
+                    coinAmount = ticker['ask'] * 1
+                else:
+                    # Buy
+                    coinAmount = 1 / ticker['bid']
+                # print("Factor 1:", coinAmount)
+                transferCoin = getTransferCoin(baseCoin, pair)
+                # print("First Transfer Coin:", transferCoin)
+            if i == 2:
+                if coinIsPairBaseCoin(transferCoin, pair):
+                    coinAmount = coinAmount * ticker['ask']
+                else:
+                    coinAmount = coinAmount / ticker['bid']
 
-    print("Number of Tickers:",len(tickers))
+                # print("Factor 2:", coinAmount)
+                transferCoin = getTransferCoin(transferCoin, pair)
+                # print("Second Transfer Coin:", transferCoin)
+
+            if i == 3:
+                if coinIsPairBaseCoin(transferCoin, pair):
+                    profit = coinAmount * ticker['ask']
+                else:
+                    profit = coinAmount / ticker['bid']
+
+                # print("Profit:", profit)
+
+                print("Profit %:", abs(1 - profit) * 100)
+
 
 def isSpotPair(value):
     return value['type'] == 'spot'
@@ -151,6 +177,24 @@ def isBaseCoinPair(pair):
 def addTriplePair(pair):
     if pair not in triplePairs:
         triplePairs.append(pair)
+
+
+def getPairCoins(pair):
+    coins = pair.split("/")
+    return coins
+
+
+def coinIsPairBaseCoin(coinToCheck, pair):
+    coins = getPairCoins(pair)
+    return coinToCheck == coins[0]
+
+
+def getTransferCoin(lastCoin, pair):
+    coins = getPairCoins(pair)
+    for coin in coins:
+        if coin != lastCoin:
+            return coin
+
 
 if __name__ == "__main__":
     run()
