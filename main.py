@@ -10,9 +10,9 @@ def run():
 
 def initialize():
 
-    print("\n\n---------------------------------------------------------\n\n")
-    print("Welcome to Arbitr8 Bot")
-    print("\n\n---------------------------------------------------------\n\n")
+    print("\n---------------------------------------------------------\n")
+    print("Welcome to Triangular Arbitr8 Bot")
+    print("\n---------------------------------------------------------\n")
 
     try:
 
@@ -71,6 +71,9 @@ def initialize():
 
         # Find triples for base coin
 
+        # ##### Sind das wirklich alle möglichen triples ???
+        # ##### Sind da auch die invertierten dabei ???
+
         triples = []
         basePairs2 = basePairs
 
@@ -111,10 +114,14 @@ def initialize():
 
 def calcArbitrage():
 
-    print("\n\nCalculate current market prices...")
+    print("\nCalculate current arbitrage possibilities...\n")
 
     exchange.load_markets(True)
     tickers = exchange.fetch_tickers(triplePairs)
+
+    global maxProfit, maxTriple
+    maxProfit = 0
+    maxTriple = []
 
     for triple in triples:
         i = 0
@@ -122,7 +129,7 @@ def calcArbitrage():
         transferCoin = ''
         profit = 0
 
-        pprint(triple)
+        # pprint(triple)
 
         for pair in triple:
             i += 1
@@ -156,7 +163,11 @@ def calcArbitrage():
 
                 # print("Profit:", profit)
 
-                print("Profit %:", abs(1 - profit) * 100)
+                if profit > maxProfit:
+                    maxProfit = profit
+                    maxTriple = triple
+
+    print("Max. Profit % ", round(abs(1 - maxProfit) * 100, 2), maxTriple)
 
 
 def isSpotPair(value):

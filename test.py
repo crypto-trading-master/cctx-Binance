@@ -40,7 +40,7 @@ def test():
                 print("First Transfer Coin:", transferCoin)
             if i == 2:
                 if coinIsPairBaseCoin(transferCoin, pair):
-                    coinAmount = coinAmount() * ticker['ask']
+                    coinAmount = coinAmount * ticker['ask']
                 else:
                     coinAmount = coinAmount / ticker['bid']
 
