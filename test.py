@@ -20,45 +20,43 @@ def test():
 
     for triple in triples:
         i = 0
-        firstFactor = 0
-        firstTransferCoin = ''
-        secondFactor = 0
-        secondTransferCoin = ''
-        thirdFactor = 0
+        coinAmount = 0
+        transferCoin = ''
+        profit = 0
 
         for pair in triple:
             i += 1
             ticker = tickers[pair]
 
             if i == 1:
-                firstTransferCoin = getTransferCoin(baseCoin, pair)
-                print("First Transfer Coin:", firstTransferCoin)
                 if coinIsPairBaseCoin(baseCoin, pair):
                     # Sell
-                    firstFactor = ticker['ask'] * 1
+                    coinAmount = ticker['ask'] * 1
                 else:
                     # Buy
-                    firstFactor = 1 / ticker['bid']
-                print("Factor 1:", firstFactor)
+                    coinAmount = 1 / ticker['bid']
+                print("Factor 1:", coinAmount)
+                transferCoin = getTransferCoin(baseCoin, pair)
+                print("First Transfer Coin:", transferCoin)
             if i == 2:
-                secondTransferCoin = getTransferCoin(firstTransferCoin, pair)
-
-                print("Second Transfer Coin:", secondTransferCoin)
-                if coinIsPairBaseCoin(firstTransferCoin, pair):
-                    secondFactor = firstFactor * ticker['ask']
+                if coinIsPairBaseCoin(transferCoin, pair):
+                    coinAmount = coinAmount() * ticker['ask']
                 else:
-                    secondFactor = firstFactor / ticker['bid']
+                    coinAmount = coinAmount / ticker['bid']
 
-                print("Factor 2:", secondFactor)
+                print("Factor 2:", coinAmount)
+                transferCoin = getTransferCoin(transferCoin, pair)
+                print("Second Transfer Coin:", transferCoin)
+
             if i == 3:
-                if coinIsPairBaseCoin(secondTransferCoin, pair):
-                    thirdFactor = secondFactor * ticker['ask']
+                if coinIsPairBaseCoin(transferCoin, pair):
+                    profit = coinAmount * ticker['ask']
                 else:
-                    thirdFactor = secondFactor / ticker['bid']
+                    profit = coinAmount / ticker['bid']
 
-                print("Factor 3:", thirdFactor)
+                print("Profit:", profit)
 
-                print("Profit %:", abs(1 - thirdFactor) * 100)
+                print("Profit %:", abs(1 - profit) * 100)
 
 
 def getPairCoins(pair):
