@@ -6,14 +6,14 @@ import json
 
 def test():
     marketPrices = {}
-    global exchange
+    global exchange, baseCoin
     exchange = ccxt.binance()
     markets = exchange.load_markets(True)
 
-    baseCoin = 'USDT'
+    baseCoin = 'BTC'
 
     triples = []
-    triple = ['BTC/USDT','ETH/BTC','ETH/USDT']
+    triple = ['BTC/USDT','ETH/USDT','ETH/BTC']
     triples.append(triple)
 
     tickers = exchange.fetch_tickers(triple)
@@ -35,33 +35,52 @@ def test():
 
             if i == 1:
                 firstTransferCoin = getFirstTransferCoin(pair)
-                if coinIsBaseCoin(baseCoin, pair):
+                if coinIsPairBaseCoin(baseCoin, pair):
                     # Sell
-                    firstFactor = ticker['ask'] / 1                    
+                    firstFactor = ticker['ask'] * 1
                 else:
                     # Buy
-                    firstFactor := 1 / ticker['bid']
+                    firstFactor = 1 / ticker['bid']
                 print("Factor 1:",firstFactor)
             if i == 2:
-                secondPairQty = firstPairQty / price
-                print("Quantity 2:",secondPairQty)
+                secondTransferCoin = getSecondTransferCoin(firstTransferCoin, pair)
+                if coinIsPairBaseCoin(firstTransferCoin, pair):
+                    secondFactor = firstFactor / ticker['bid']
+                else:
+                    secondFactor = firstFactor * ticker['ask']
+                print("Factor 2:",secondFactor)
             if i == 3:
-                thirdPairQty = secondPairQty * price
-                print("Quantity 3:",thirdPairQty)
-                print("Profit %:",abs(1 - (thirdPairQty / startBaseQty)) * 100)
+                if coinIsPairBaseCoin(secondTransferCoin, pair):
+                    thirdFactor = secondFactor * ticker['ask']
+                else:
+                    thirdFactor = secondFactor / ticker['bid']
+
+                print("Factor 3:",thirdFactor)
+
+                print("Profit %:",abs(1 - thirdFactor) * 100)
 
 
 
     return
 
-def coinIsBaseCoin(coinToCheck,pair):
+def getPairCoins(pair):
     coins = pair.split("/")
+    return coins
+
+def coinIsPairBaseCoin(coinToCheck,pair):
+    coins = getPairCoins(pair)
     return coinToCheck == coins[0]
 
 def getFirstTransferCoin(pair):
-    coins = pair.split("/")
+    coins = getPairCoins(pair)
     for coin in coins:
-        if coin != baseCoin
+        if coin != baseCoin:
+            return coin
+
+def getSecondTransferCoin(firstTransferCoin,pair):
+    coins = getPairCoins(pair)
+    for coin in coins:
+        if coin != firstTransferCoin:
             return coin
 
 if __name__ == "__main__":
