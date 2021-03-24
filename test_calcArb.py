@@ -10,8 +10,6 @@ def test():
     exchange = ccxt.binance()
     markets = exchange.load_markets(True)
 
-    baseCoin = 'USDT'
-
     triples = []
     triple = ['BTC/USDT','ETH/BTC','ETH/USDT']
     triples.append(triple)
@@ -23,25 +21,19 @@ def test():
     for triple in triples:
         i = 0
         basePrice = 0
-        firstFactor = 0;
-        firstTransferCoin = ''
-        secondFactor = 0;
-        secondTransferCoin = ''
-        thirdFactor = 0;
+        firstPairQty = 0;
+        secondPairQty = 0;
+        thirdPairQty = 0;
 
         for pair in triple:
             i += 1
-            ticker = tickers[pair]
 
+            ticker = tickers[pair]
+            price = ticker['last']
+            print(pair,":",price)
             if i == 1:
-                firstTransferCoin = getFirstTransferCoin(pair)
-                if coinIsBaseCoin(baseCoin, pair):
-                    # Sell
-                    firstFactor = ticker['ask'] / 1                    
-                else:
-                    # Buy
-                    firstFactor := 1 / ticker['bid']
-                print("Factor 1:",firstFactor)
+                firstPairQty = startBaseQty / price
+                print("Quantity 1:",firstPairQty)
             if i == 2:
                 secondPairQty = firstPairQty / price
                 print("Quantity 2:",secondPairQty)
@@ -54,15 +46,7 @@ def test():
 
     return
 
-def coinIsBaseCoin(coinToCheck,pair):
-    coins = pair.split("/")
-    return coinToCheck == coins[0]
 
-def getFirstTransferCoin(pair):
-    coins = pair.split("/")
-    for coin in coins:
-        if coin != baseCoin
-            return coin
 
 if __name__ == "__main__":
     test()
