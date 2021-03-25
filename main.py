@@ -1,4 +1,5 @@
 import ccxt
+from functions import *
 from pprint import pprint
 import time
 import json
@@ -44,7 +45,7 @@ def initialize():
         for pair, value in markets.items():
             if isActiveMarket(value) and isSpotPair(value):
                 allPairs.append(pair)
-                if isBaseCoinPair(pair):
+                if isExchangeBaseCoinPair(baseCoin, pair):
                     basePairs.append(pair)
 
         print("Number of valid market pairs:", len(allPairs))
@@ -95,11 +96,11 @@ def initialize():
                                     if betweenPair in allPairs:
                                         triple = []
                                         triple.append(pair)
-                                        addTriplePair(pair)
+                                        addTriplePair(triplePairs, pair)
                                         triple.append(betweenPair)
-                                        addTriplePair(betweenPair)
+                                        addTriplePair(triplePairs, betweenPair)
                                         triple.append(lastPair)
-                                        addTriplePair(lastPair)
+                                        addTriplePair(triplePairs, lastPair)
                                         # Add triple to array of triples
                                         triples.append(triple)
 
@@ -168,43 +169,6 @@ def calcArbitrage():
                     maxTriple = triple
 
     print("Max. Profit % ", round(abs(1 - maxProfit) * 100, 2), maxTriple)
-
-
-def isSpotPair(value):
-    return value['type'] == 'spot'
-
-
-def isActiveMarket(value):
-    return value['info']['status'] == 'TRADING'
-
-
-def isBaseCoinPair(pair):
-    coins = pair.split("/")
-    for coin in coins:
-        if coin == baseCoin:
-            return True
-
-
-def addTriplePair(pair):
-    if pair not in triplePairs:
-        triplePairs.append(pair)
-
-
-def getPairCoins(pair):
-    coins = pair.split("/")
-    return coins
-
-
-def coinIsPairBaseCoin(coinToCheck, pair):
-    coins = getPairCoins(pair)
-    return coinToCheck == coins[0]
-
-
-def getTransferCoin(lastCoin, pair):
-    coins = getPairCoins(pair)
-    for coin in coins:
-        if coin != lastCoin:
-            return coin
 
 
 if __name__ == "__main__":
