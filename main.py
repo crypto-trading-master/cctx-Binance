@@ -58,10 +58,11 @@ def initialize():
         # Find between trading pairs
 
         for pair in basePairs:
-            coins = pair.split("/")
+            coins = getPairCoins(pair)
             for coin in coins:
-                if coin not in coinsBetween:
-                    coinsBetween.append(coin)
+                if coin != baseCoin:
+                    if coin not in coinsBetween:
+                        coinsBetween.append(coin)
 
         # Check if between pair exists
 
@@ -83,30 +84,36 @@ def initialize():
         basePairs2 = basePairs
 
         for pair in basePairs:
+            firstCoins = getPairCoins(pair)
+            for firstCoin in firstCoins:
+                if firstCoin != baseCoin:
+                    firstTransferCoin = firstCoin
+            for pairBetween in pairsBetween:
+                betweenPairFound = False
+                secondCoins = getPairCoins(pairBetween)
+                for secondCoin in secondCoins:
+                    if secondCoin == firstTransferCoin:
+                        betweenPairFound = True
+                        secondPairCoin = secondCoin
+                    else:
+                        secondTransferCoin = secondCoin
+                if betweenPairFound:
+                    for lastPair in basePairs2:
+                        thirdCoins = getPairCoins(lastPair)
+                        for thirdCoin in thirdCoins:
+                            if thirdCoin != baseCoin:
+                                thirdPairCoin = thirdCoin
 
-            # Find last Pair
-            for pair2 in basePairs2:
-                if pair2 != pair:
-                    lastPair = pair2
-
-                    # Find pair in between
-                    baseCoinsBetween = pair.split("/")
-                    quoteCoinsBetween = lastPair.split("/")
-                    for baseCoinBetween in baseCoinsBetween:
-                        if baseCoinBetween != baseCoin:
-                            for quoteCoinBetween in quoteCoinsBetween:
-                                if quoteCoinBetween != baseCoin:
-                                    betweenPair = baseCoinBetween + "/" + quoteCoinBetween
-                                    if betweenPair in allPairs:
-                                        triple = []
-                                        triple.append(pair)
-                                        addTriplePair(triplePairs, pair)
-                                        triple.append(betweenPair)
-                                        addTriplePair(triplePairs, betweenPair)
-                                        triple.append(lastPair)
-                                        addTriplePair(triplePairs, lastPair)
-                                        # Add triple to array of triples
-                                        triples.append(triple)
+                        if firstTransferCoin == secondPairCoin and secondTransferCoin == thirdPairCoin:
+                            triple = []
+                            triple.append(pair)
+                            addTriplePair(triplePairs, pair)
+                            triple.append(pairBetween)
+                            addTriplePair(triplePairs, pairBetween)
+                            triple.append(lastPair)
+                            addTriplePair(triplePairs, lastPair)
+                            # Add triple to array of triples
+                            triples.append(triple)
 
         print("Number of Triples:", len(triples))
         print("Number of Triple Pairs:", len(triplePairs))
@@ -172,7 +179,7 @@ def calcArbitrage():
                     maxProfit = profit
                     maxTriple = triple
 
-    print("Max. Profit % ", round(abs(1 - maxProfit) * 100, 2), maxTriple)
+    print("Max. Profit % ", round((maxProfit - 1) * 100, 2), maxTriple)
 
 
 if __name__ == "__main__":

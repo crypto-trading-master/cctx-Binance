@@ -7,7 +7,7 @@ def isActiveMarket(value):
 
 
 def isExchangeBaseCoinPair(baseCoin, pair):
-    coins = pair.split("/")
+    coins = getPairCoins(pair)
     for coin in coins:
         if coin == baseCoin:
             return True
