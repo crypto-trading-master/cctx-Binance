@@ -8,6 +8,14 @@ def test():
 
     global exchange, baseCoin
     exchange = ccxt.binance()
+    exchange.set_sandbox_mode(True)
+
+    pprint(exchange.has)
+
+
+
+    return
+
     markets = exchange.load_markets(True)
 
     baseCoin = 'USDT'
