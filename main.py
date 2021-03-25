@@ -4,6 +4,8 @@ from pprint import pprint
 import time
 import json
 
+# pylama:ignore=W:select=F405
+
 
 def run():
     initialize()
@@ -19,21 +21,23 @@ def initialize():
 
         global baseCoin, exchange, triplePairs, triples
 
-        with open('config.json', 'r') as f:
-            config = json.load(f)
-
-        exchange = ccxt.binance({
-            'apiKey': config['apiKey'],
-            'secret': config['secret']
-        })
-
         basePairs = []
         coinsBetween = []
         allPairs = []
         triplePairs = []
 
-        baseCoin = config['baseCoin']
+        with open('config.json', 'r') as f:
+            config = json.load(f)
 
+        exchangeName = config['exchangeName']
+        exchange_class = getattr(ccxt, exchangeName)
+        exchange = exchange_class({
+            'apiKey': config['apiKey'],
+            'secret': config['secret']
+        })
+        print("Exchange:", exchangeName)
+
+        baseCoin = config['baseCoin']
         print("Base coin:", baseCoin)
 
         markets = exchange.load_markets()
