@@ -59,6 +59,7 @@ def initialize():
                     basePairs.append(pair)
 
         print("Number of valid market pairs:", len(allPairs))
+        pprint(allPairs)
         print("Number of base coin pairs:", len(basePairs))
 
         # Find between trading pairs
@@ -188,7 +189,9 @@ def getBestArbitrageTriple():
 
     print("Max. Profit % ", round((maxProfit - 1) * 100, 2), maxTriple)
 
+
 def tradeArbitrageTriple():
+    pass
 
 
 if __name__ == "__main__":
