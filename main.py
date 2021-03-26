@@ -1,6 +1,7 @@
 import ccxt
 from functions import *
 from pprint import pprint
+import os
 import time
 import json
 
@@ -26,14 +27,17 @@ def initialize():
         allPairs = []
         triplePairs = []
 
+        apiKey = os.environ.get('apiKey')
+        secret = os.environ.get('secret')
+
         with open('config.json', 'r') as f:
             config = json.load(f)
 
         exchangeName = config['exchangeName']
         exchange_class = getattr(ccxt, exchangeName)
         exchange = exchange_class({
-            'apiKey': config['apiKey'],
-            'secret': config['secret']
+            'apiKey': apiKey,
+            'secret': secret
         })
         print("Exchange:", exchangeName)
 
