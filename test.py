@@ -9,8 +9,9 @@ def test():
     global exchange, baseCoin
     exchange = ccxt.binance()
     exchange.set_sandbox_mode(True)
+    markets = exchange.load_markets(True)
 
-    pprint(exchange.has)
+    pprint(markets)
 
 
 

@@ -36,9 +36,11 @@ def initialize():
         exchangeName = config['exchangeName']
         exchange_class = getattr(ccxt, exchangeName)
         exchange = exchange_class({
+            'enableRateLimit': True,
             'apiKey': apiKey,
             'secret': secret
         })
+        exchange.set_sandbox_mode(True)
         print("Exchange:", exchangeName)
 
         baseCoin = config['baseCoin']
@@ -122,13 +124,14 @@ def initialize():
         print("Number of Triples:", len(triples))
         print("Number of Triple Pairs:", len(triplePairs))
 
-        calcArbitrage()
+        getBestArbitrageTriple()
+        tradeArbitrageTriple()
 
     except():
         print("\n \n \nATTENTION: NON-VALID CCTX CONNECTION \n \n \n")
 
 
-def calcArbitrage():
+def getBestArbitrageTriple():
 
     print("\nCalculate current arbitrage possibilities...\n")
 
@@ -184,6 +187,8 @@ def calcArbitrage():
                     maxTriple = triple
 
     print("Max. Profit % ", round((maxProfit - 1) * 100, 2), maxTriple)
+
+def tradeArbitrageTriple():
 
 
 if __name__ == "__main__":
