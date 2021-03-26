@@ -33,3 +33,11 @@ def getTransferCoin(lastCoin, pair):
     for coin in coins:
         if coin != lastCoin:
             return coin
+
+
+def getBuyPrice(ticker):
+    return ticker['ask']  # ask
+
+
+def getSellPrice(ticker):
+    return ticker['bid']  # bid

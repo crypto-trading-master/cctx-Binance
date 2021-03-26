@@ -5,8 +5,6 @@ import os
 import time
 import json
 
-# pylama:ignore=W:select=F405
-
 
 def run():
     initialize()
@@ -40,7 +38,9 @@ def initialize():
             'apiKey': apiKey,
             'secret': secret
         })
-        exchange.set_sandbox_mode(True)
+        if config['testMode'] is True:
+            exchange.set_sandbox_mode(True)
+
         print("Exchange:", exchangeName)
 
         baseCoin = config['baseCoin']
@@ -48,18 +48,20 @@ def initialize():
 
         markets = exchange.load_markets()
 
-        # Find Trading Pairs for base coin
-
         print("\n\nGenerating triples...\n")
+
+        # Find Trading Pairs for base coin
 
         for pair, value in markets.items():
             if isActiveMarket(value) and isSpotPair(value):
                 allPairs.append(pair)
                 if isExchangeBaseCoinPair(baseCoin, pair):
+
+                    # ######### TO DO: Check market volume
+
                     basePairs.append(pair)
 
         print("Number of valid market pairs:", len(allPairs))
-        pprint(allPairs)
         print("Number of base coin pairs:", len(basePairs))
 
         # Find between trading pairs
@@ -83,9 +85,6 @@ def initialize():
                     pairsBetween.append(pair)
 
         # Find triples for base coin
-
-        # ##### Sind das wirklich alle möglichen triples ???
-        # ##### Sind da auch die invertierten dabei ???
 
         triples = []
         basePairs2 = basePairs
@@ -126,10 +125,9 @@ def initialize():
         print("Number of Triple Pairs:", len(triplePairs))
 
         getBestArbitrageTriple()
-        tradeArbitrageTriple()
 
-    except():
-        print("\n \n \nATTENTION: NON-VALID CCTX CONNECTION \n \n \n")
+    except ccxt.ExchangeError as e:
+        print(str(e))
 
 
 def getBestArbitrageTriple():
@@ -149,8 +147,6 @@ def getBestArbitrageTriple():
         transferCoin = ''
         profit = 0
 
-        # pprint(triple)
-
         for pair in triple:
             i += 1
             ticker = tickers[pair]
@@ -158,30 +154,23 @@ def getBestArbitrageTriple():
             if i == 1:
                 if coinIsPairBaseCoin(baseCoin, pair):
                     # Sell
-                    coinAmount = ticker['ask'] * 1
+                    coinAmount = getSellPrice(ticker) * 1
                 else:
                     # Buy
-                    coinAmount = 1 / ticker['bid']
-                # print("Factor 1:", coinAmount)
+                    coinAmount = 1 / getBuyPrice(ticker)
                 transferCoin = getTransferCoin(baseCoin, pair)
-                # print("First Transfer Coin:", transferCoin)
             if i == 2:
                 if coinIsPairBaseCoin(transferCoin, pair):
-                    coinAmount = coinAmount * ticker['ask']
+                    coinAmount = coinAmount * getSellPrice(ticker)
                 else:
-                    coinAmount = coinAmount / ticker['bid']
-
-                # print("Factor 2:", coinAmount)
+                    coinAmount = coinAmount / getBuyPrice(ticker)
                 transferCoin = getTransferCoin(transferCoin, pair)
-                # print("Second Transfer Coin:", transferCoin)
 
             if i == 3:
                 if coinIsPairBaseCoin(transferCoin, pair):
-                    profit = coinAmount * ticker['ask']
+                    profit = coinAmount * getSellPrice(ticker)
                 else:
-                    profit = coinAmount / ticker['bid']
-
-                # print("Profit:", profit)
+                    profit = coinAmount / getBuyPrice(ticker)
 
                 if profit > maxProfit:
                     maxProfit = profit
@@ -189,8 +178,12 @@ def getBestArbitrageTriple():
 
     print("Max. Profit % ", round((maxProfit - 1) * 100, 2), maxTriple)
 
+    # ############## TO DO: Verify triple multiple times
 
-def tradeArbitrageTriple():
+    doPaperTrading()
+
+
+def doPaperTrading():
     pass
 
 

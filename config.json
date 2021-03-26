@@ -1,4 +1,11 @@
 {
-    "baseCoin" : "BTC",
-    "exchangeName": "binance"
+    "testMode": false,
+    "exchangeName": "binance",
+    "baseCoin": "BNB",
+    "minBaseCoinVolume": 1,
+    "startBalance": 10000,
+    "minProfit": 0.001,
+    "maxNoOfTrades": 10,
+    "maxBalance": 100000,
+    "riskFactor": 1
 }

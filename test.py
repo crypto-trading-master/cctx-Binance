@@ -2,16 +2,33 @@ import ccxt
 from pprint import pprint
 import time
 import json
+import os
 
 
 def test():
 
     global exchange, baseCoin
-    exchange = ccxt.binance()
-    exchange.set_sandbox_mode(True)
+
+    with open('config.json', 'r') as f:
+        config = json.load(f)
+
+    apiKey = os.environ.get('apiKey')
+    secret = os.environ.get('secret')
+
+    exchangeName = config['exchangeName']
+    exchange_class = getattr(ccxt, exchangeName)
+    exchange = exchange_class({
+        'enableRateLimit': True,
+        'apiKey': apiKey,
+        'secret': secret
+    })
     markets = exchange.load_markets(True)
 
-    pprint(markets)
+    tickers = exchange.fetch_tickers(markets)
+
+    pprint(tickers['UNFI/USDT'])
+
+
 
 
 
