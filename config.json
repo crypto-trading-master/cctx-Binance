@@ -1,6 +1,4 @@
 {
-    "apiKey" : "XoDv1EZ1xjjgKN4Pbk65QvKFZnUBcjiNtYJcQuaWY8GzOfY9BlFdq74LVcRXpqXD",
-    "secret" : "u6gR3yYvBQOK8euHBMfSLhwerKEguH57uIsRXZ2p1qJk8uomwhcoto4JcbwIV6WS",
-	"baseCoin" : "BTC",
+    "baseCoin" : "BTC",
     "exchangeName": "binance"
 }

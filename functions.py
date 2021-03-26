@@ -3,7 +3,7 @@ def isSpotPair(value):
 
 
 def isActiveMarket(value):
-    return value['info']['status'] == 'TRADING'
+    return value['active'] is True
 
 
 def isExchangeBaseCoinPair(baseCoin, pair):
