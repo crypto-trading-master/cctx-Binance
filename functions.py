@@ -36,8 +36,8 @@ def getTransferCoin(lastCoin, pair):
 
 
 def getBuyPrice(ticker):
-    return ticker['ask']  # ask
+    return ticker['last']  # ask
 
 
 def getSellPrice(ticker):
-    return ticker['bid']  # bid
+    return ticker['last']  # bid

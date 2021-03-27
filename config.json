@@ -1,9 +1,9 @@
 {
     "testMode": false,
     "exchangeName": "binance",
-    "baseCoin": "BNB",
+    "baseCoin": "USDT",
     "minBaseCoinVolume": 1,
-    "startBalance": 10000,
+    "startBalance": 1000,
     "minProfit": 0.001,
     "maxNoOfTrades": 10,
     "maxBalance": 100000,
