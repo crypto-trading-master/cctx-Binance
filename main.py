@@ -18,15 +18,21 @@ def initialize():
 
     try:
 
-        global baseCoin, baseCoinBalance, exchange, triplePairs, triples, bestArbTriple
+        global baseCoin, baseCoinBalance, exchange, triplePairs, triples, \
+               bestArbTriple, noOfTrades, minProfit
 
         basePairs = []
         coinsBetween = []
         allPairs = []
         triplePairs = []
 
-        apiKey = os.environ.get('apiKey')
-        secret = os.environ.get('secret')
+        with open('secret.json', 'r') as f:
+            secretFile = json.load(f)
+
+        apiKey = secretFile['apiKey']
+        secret = secretFile['secret']
+
+        print(apiKey)
 
         with open('config.json', 'r') as f:
             config = json.load(f)
@@ -40,6 +46,9 @@ def initialize():
         })
         if config['testMode'] is True:
             exchange.set_sandbox_mode(True)
+
+        noOfTrades = config['noOfTrades']
+        minProfit = config['minProfit']
 
         print("Exchange:", exchangeName)
 
@@ -127,10 +136,14 @@ def initialize():
         print("Number of Triples:", len(triples))
         print("Number of Triple Pairs:", len(triplePairs))
 
-        getBestArbitrageTriple()
+        arbitrage()
 
     except ccxt.ExchangeError as e:
         print(str(e))
+
+def arbitrage():
+    for tradeCounter in range(noOfTrades):
+        getBestArbitrageTriple()
 
 
 def getBestArbitrageTriple():
@@ -191,16 +204,45 @@ def getBestArbitrageTriple():
                     maxTriple = triple
                     bestArbTriple = arbTriple
 
-    print("Max. Profit % ", round((maxProfit - 1) * 100, 2), maxTriple)
-    pprint(bestArbTriple)
+    maxProfit = maxProfit - 1
+    if maxProfit < minProfit:
+        getBestArbitrageTriple()
+    else:
+        doPaperTrading(bestArbTriple)
+
+    print("Max. Profit % ", round((maxProfit) * 100, 2), maxTriple)
 
     # ############## TO DO: Verify triple multiple times
 
-    doPaperTrading()
+def doPaperTrading(arbTriple):
+    pprint(arbTriple)
+
+    i = 0
+
+    type = 'market'
+    params = {
+        'test': True
+    }
+
+    tradeAmount = baseCoinBalance
+
+    for pairNo in range(3):
+        i += 1
+        pair = arbTriple[i]['pair']
+        side = arbTriple[i]['tradeAction']
+        amount = arbTriple[i]['calcAmount']
+
+        print(pair)
+        print(tradeAmount)
+
+        if side == 'buy':
+            order = exchange.create_market_buy_order(pair, amount, params)
+        else:
+            order = exchange.create_market_sell_order(pair, amount, params)
 
 
-def doPaperTrading():
-    pass
+        pprint(order)
+
 
 
 if __name__ == "__main__":

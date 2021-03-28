@@ -1,11 +1,11 @@
 {
-    "testMode": false,
+    "testMode": true,
     "exchangeName": "binance",
     "baseCoin": "USDT",
     "minBaseCoinVolume": 1,
     "startBalance": 1000,
     "minProfit": 0.001,
-    "maxNoOfTrades": 10,
+    "noOfTrades": 1,
     "maxBalance": 100000,
     "riskFactor": 1
 }
