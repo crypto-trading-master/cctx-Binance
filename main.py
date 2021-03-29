@@ -32,8 +32,6 @@ def initialize():
         apiKey = secretFile['apiKey']
         secret = secretFile['secret']
 
-        print(apiKey)
-
         with open('config.json', 'r') as f:
             config = json.load(f)
 
@@ -67,8 +65,6 @@ def initialize():
         for pair, value in markets.items():
             if isActiveMarket(value) and isSpotPair(value):
                 allPairs.append(pair)
-
-        # TODO: Check if pairs have ticker price
 
         tickers = exchange.fetch_tickers(allPairs)
 
@@ -195,7 +191,7 @@ def getBestArbitrageTriple():
                 coinAmount = tickerPrice * coinAmount
                 arbTriple[i]['tradeAction'] = 'sell'
             else:
-                # ######### TO DO arbTriple[i]['baseCoin']
+                # ######### TODO arbTriple[i]['baseCoin']
                 arbTriple[i]['quoteCoin'] = transferCoin
                 # Buy
                 tickerPrice = getBuyPrice(ticker)
@@ -218,49 +214,46 @@ def getBestArbitrageTriple():
 
     print("Max. Profit % ", round((maxProfit) * 100, 2), maxTriple)
 
-    '''
-
     if maxProfit < minProfit:
         getBestArbitrageTriple()
     else:
         doPaperTrading(bestArbTriple)
 
-    '''
-
     # ############## TODO: Verify triple multiple times
 
 def doPaperTrading(arbTriple):
-    pprint(arbTriple)
 
     i = 0
 
-    type = 'market'
-    params = {
-        'test': True
-    }
-
     tradeAmount = baseCoinBalance
 
-    for pairNo in range(3):
+    for pair in arbTriple['triple']:
         i += 1
-        pair = arbTriple[i]['pair']
+
         side = arbTriple[i]['tradeAction']
-        amount = arbTriple[i]['calcAmount']
 
-        print(pair)
-        print(tradeAmount)
+        # print(pair)
+        # print(tradeAmount)
 
-        '''
+        pprint(arbTriple[i])
 
         if side == 'buy':
+            params = {}
+            type = 'market'
+            amount = 0;
+            price = 0;
+            # params['amount'] = None
+            params['quoteOrderQty'] = exchange.costToPrecision(pair, tradeAmount)
+            pprint(params)
             order = exchange.create_market_buy_order(pair, amount, params)
+            # order = exchange.create_order(pair, type, side, amount, price, params)
         else:
-            order = exchange.create_market_sell_order(pair, amount, params)
+            order = exchange.create_market_sell_order(pair, tradeAmount)
 
+        tradeAmount = order['filled']
 
         pprint(order)
 
-        '''
 
 if __name__ == "__main__":
     run()

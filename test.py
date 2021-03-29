@@ -9,13 +9,14 @@ def test():
 
     global exchange, baseCoin
 
+    with open('secret.json', 'r') as f:
+        secretFile = json.load(f)
+
+    apiKey = secretFile['apiKey']
+    secret = secretFile['secret']
+
     with open('config.json', 'r') as f:
         config = json.load(f)
-
-    apiKey = os.environ.get('apiKey')
-    secret = os.environ.get('secret')
-
-
 
     exchangeName = config['exchangeName']
     exchange_class = getattr(ccxt, exchangeName)
@@ -27,7 +28,11 @@ def test():
 
     if config['testMode'] is True:
         exchange.set_sandbox_mode(True)
-        
+
+    pprint(exchange.fetchBalance())
+
+    return
+
     markets = exchange.load_markets(True)
 
     tickers = exchange.fetch_tickers(markets)
