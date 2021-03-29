@@ -15,6 +15,8 @@ def test():
     apiKey = os.environ.get('apiKey')
     secret = os.environ.get('secret')
 
+
+
     exchangeName = config['exchangeName']
     exchange_class = getattr(ccxt, exchangeName)
     exchange = exchange_class({
@@ -22,11 +24,15 @@ def test():
         'apiKey': apiKey,
         'secret': secret
     })
+
+    if config['testMode'] is True:
+        exchange.set_sandbox_mode(True)
+        
     markets = exchange.load_markets(True)
 
     tickers = exchange.fetch_tickers(markets)
 
-    pprint(tickers['UNFI/USDT'])
+    pprint(tickers['BTC/USDT'])
 
 
 

@@ -1,5 +1,5 @@
 {
-    "testMode": true,
+    "testMode": false,
     "exchangeName": "binance",
     "baseCoin": "USDT",
     "minBaseCoinVolume": 1,

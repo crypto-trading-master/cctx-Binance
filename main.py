@@ -67,9 +67,18 @@ def initialize():
         for pair, value in markets.items():
             if isActiveMarket(value) and isSpotPair(value):
                 allPairs.append(pair)
+
+        # TODO: Check if pairs have ticker price
+
+        tickers = exchange.fetch_tickers(allPairs)
+
+        for pair in allPairs:
+            if not tickerHasPrice(tickers[pair]):
+                allPairs.remove(pair)
+            else:
                 if isExchangeBaseCoinPair(baseCoin, pair):
 
-                    # ######### TO DO: Check market volume
+                    # ######### TODO: Check market volume
 
                     basePairs.append(pair)
 
@@ -122,7 +131,8 @@ def initialize():
                             if thirdCoin != baseCoin:
                                 thirdPairCoin = thirdCoin
 
-                        if firstTransferCoin == secondPairCoin and secondTransferCoin == thirdPairCoin:
+                        if firstTransferCoin == secondPairCoin and \
+                           secondTransferCoin == thirdPairCoin:
                             triple = []
                             triple.append(pair)
                             addTriplePair(triplePairs, pair)
@@ -205,14 +215,19 @@ def getBestArbitrageTriple():
                     bestArbTriple = arbTriple
 
     maxProfit = maxProfit - 1
+
+    print("Max. Profit % ", round((maxProfit) * 100, 2), maxTriple)
+
+    '''
+
     if maxProfit < minProfit:
         getBestArbitrageTriple()
     else:
         doPaperTrading(bestArbTriple)
 
-    print("Max. Profit % ", round((maxProfit) * 100, 2), maxTriple)
+    '''
 
-    # ############## TO DO: Verify triple multiple times
+    # ############## TODO: Verify triple multiple times
 
 def doPaperTrading(arbTriple):
     pprint(arbTriple)
@@ -235,6 +250,8 @@ def doPaperTrading(arbTriple):
         print(pair)
         print(tradeAmount)
 
+        '''
+
         if side == 'buy':
             order = exchange.create_market_buy_order(pair, amount, params)
         else:
@@ -243,7 +260,7 @@ def doPaperTrading(arbTriple):
 
         pprint(order)
 
-
+        '''
 
 if __name__ == "__main__":
     run()
