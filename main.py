@@ -1,13 +1,13 @@
 import ccxt
 from functions import *
 from pprint import pprint
-import os
-import time
 import json
 
 
 def run():
     initialize()
+    arbitrage()
+    # test()
 
 
 def initialize():
@@ -26,14 +26,18 @@ def initialize():
         allPairs = []
         triplePairs = []
 
+        with open('config.json', 'r') as f:
+            config = json.load(f)
+
         with open('secret.json', 'r') as f:
             secretFile = json.load(f)
 
-        apiKey = secretFile['apiKey']
-        secret = secretFile['secret']
-
-        with open('config.json', 'r') as f:
-            config = json.load(f)
+        if config['testMode'] is True:
+            apiKey = secretFile['testApiKey']
+            secret = secretFile['testSecret']
+        else:
+            apiKey = secretFile['apiKey']
+            secret = secretFile['secret']
 
         exchangeName = config['exchangeName']
         exchange_class = getattr(ccxt, exchangeName)
@@ -42,6 +46,7 @@ def initialize():
             'apiKey': apiKey,
             'secret': secret
         })
+
         if config['testMode'] is True:
             exchange.set_sandbox_mode(True)
 
@@ -142,8 +147,6 @@ def initialize():
         print("Number of Triples:", len(triples))
         print("Number of Triple Pairs:", len(triplePairs))
 
-        arbitrage()
-
     except ccxt.ExchangeError as e:
         print(str(e))
 
@@ -214,42 +217,31 @@ def getBestArbitrageTriple():
     maxProfit = maxProfit - 1
 
     print("Max. Profit % ", round((maxProfit) * 100, 2), maxTriple)
-    pprint(bestArbTriple)
 
     if maxProfit < minProfit:
         getBestArbitrageTriple()
     else:
-        doPaperTrading(bestArbTriple)
+        tradeArbTriple(bestArbTriple)
 
     # ############## TODO: Verify triple multiple times
 
 
-def doPaperTrading(arbTriple):
-
-    return
-
-    i = 0
-
+def tradeArbTriple(arbTriple):
     tradeAmount = baseCoinBalance
 
-    for pair in arbTriple['triple']:
-        i += 1
+    print("Start balance:", tradeAmount)
 
+    for pair in arbTriple['triple']:
         side = arbTriple[pair]['tradeAction']
 
-        # print(pair)
-        # print(tradeAmount)
-
-        pprint(arbTriple[pair])
+        print("Trading pair:", pair)
+        print("Trade action:", side)
+        print("Coin amount to trade:", tradeAmount)
 
         if side == 'buy':
             params = {}
-            type = 'market'
-            amount = 0;
-            price = 0;
-            # params['amount'] = None
+            amount = 0
             params['quoteOrderQty'] = exchange.costToPrecision(pair, tradeAmount)
-            pprint(params)
             order = exchange.create_market_buy_order(pair, amount, params)
             # order = exchange.create_order(pair, type, side, amount, price, params)
         else:
@@ -257,7 +249,32 @@ def doPaperTrading(arbTriple):
 
         tradeAmount = order['filled']
 
-        pprint(order)
+        # pprint(order)
+
+    print("End balance:", tradeAmount)
+
+
+def test():
+
+    pair = 'LTC/BNB'
+
+    exchange.load_markets(True)
+    tickers = exchange.fetch_tickers(pair)
+
+
+
+    pprint(tickers[pair])
+
+
+
+
+    pprint(exchange.fetchOrderBook(pair))
+
+
+
+    # order = exchange.create_market_sell_order('BNB/BTC', 0.03)
+
+
 
 
 if __name__ == "__main__":
