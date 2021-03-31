@@ -18,8 +18,8 @@ def initialize():
 
     try:
 
-        global baseCoin, baseCoinBalance, exchange, triplePairs, triples, \
-               bestArbTriple, noOfTrades, minProfit
+        global baseCoin, coinBalance, exchange, triplePairs, triples, \
+               bestArbTriple, noOfTrades, minProfit, paperTrading
 
         basePairs = []
         coinsBetween = []
@@ -32,7 +32,7 @@ def initialize():
         with open('secret.json', 'r') as f:
             secretFile = json.load(f)
 
-        if config['testMode'] is True:
+        if config['useTestNet'] is True:
             apiKey = secretFile['testApiKey']
             secret = secretFile['testSecret']
         else:
@@ -47,9 +47,10 @@ def initialize():
             'secret': secret
         })
 
-        if config['testMode'] is True:
+        if config['useTestNet'] is True:
             exchange.set_sandbox_mode(True)
 
+        paperTrading = config['paperTrading']
         noOfTrades = config['noOfTrades']
         minProfit = config['minProfit']
 
@@ -58,8 +59,8 @@ def initialize():
         baseCoin = config['baseCoin']
         print("Base coin:", baseCoin)
 
-        baseCoinBalance = config['startBalance']
-        print("Start balance:", f"{baseCoinBalance:,}")
+        coinBalance = config['startBalance']
+        print("Start balance:", f"{coinBalance:,}")
 
         markets = exchange.load_markets()
 
@@ -158,7 +159,7 @@ def arbitrage():
 
 def getBestArbitrageTriple():
 
-    print("\nCalculate current arbitrage possibilities...\n")
+    print("\nCalculate current arbitrage possibilities...")
 
     exchange.load_markets(True)
     tickers = exchange.fetch_tickers(triplePairs)
@@ -185,7 +186,7 @@ def getBestArbitrageTriple():
 
             if i == 1:
                 transferCoin = baseCoin
-                coinAmount = baseCoinBalance
+                coinAmount = coinBalance
 
             if coinIsPairBaseCoin(transferCoin, pair):
                 arbTriple[pair]['baseCoin'] = transferCoin
@@ -208,7 +209,7 @@ def getBestArbitrageTriple():
             arbTriple[pair]['transferCoin'] = transferCoin
 
             if i == 3:
-                profit = arbTriple[pair]['calcAmount'] / baseCoinBalance
+                profit = arbTriple[pair]['calcAmount'] / coinBalance
                 if profit > maxProfit:
                     maxProfit = profit
                     maxTriple = triple
@@ -227,9 +228,12 @@ def getBestArbitrageTriple():
 
 
 def tradeArbTriple(arbTriple):
-    tradeAmount = baseCoinBalance
+    global coinBalance
+    tradeAmount = coinBalance
 
-    print("Start balance:", tradeAmount)
+    exchange.fetch_tickers()
+
+    print("\nStart balance:", tradeAmount)
 
     for pair in arbTriple['triple']:
         side = arbTriple[pair]['tradeAction']
@@ -238,21 +242,30 @@ def tradeArbTriple(arbTriple):
         print("Trade action:", side)
         print("Coin amount to trade:", tradeAmount)
 
-        if side == 'buy':
-            params = {}
-            amount = 0
-            params['quoteOrderQty'] = exchange.costToPrecision(pair, tradeAmount)
-            order = exchange.create_market_buy_order(pair, amount, params)
-            # order = exchange.create_order(pair, type, side, amount, price, params)
-        else:
-            order = exchange.create_market_sell_order(pair, tradeAmount)
+        if paperTrading is True:
+            exchange.load_markets(True)
+            orderbook = (exchange.fetchOrderBook(pair))
+            bid = orderbook['bids'][0][0] if len(orderbook['bids']) > 0 else 0
+            ask = orderbook['asks'][0][0] if len(orderbook['asks']) > 0 else 0
 
-        tradeAmount = order['filled']
+            if side == 'buy':
+                tradeAmount = tradeAmount / ask
+            else:
+                tradeAmount = tradeAmount * bid
+        else:   # No Paper Trading
+            if side == 'buy':
+                params = {}
+                amount = 0
+                params['quoteOrderQty'] = exchange.costToPrecision(pair, tradeAmount)
+                order = exchange.create_market_buy_order(pair, amount, params)
+                # order = exchange.create_order(pair, type, side, amount, price, params)
+            else:
+                order = exchange.create_market_sell_order(pair, tradeAmount)
 
-        # pprint(order)
+            tradeAmount = order['filled']
 
     print("End balance:", tradeAmount)
-
+    coinBalance = tradeAmount
 
 def test():
 

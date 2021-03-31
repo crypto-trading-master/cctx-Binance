@@ -1,11 +1,12 @@
 {
-    "testMode": true,
+    "useTestNet": false,
     "exchangeName": "binance",
     "baseCoin": "BNB",
-    "minBaseCoinVolume": 1,
     "startBalance": 1,
+    "minBaseCoinVolume": 1,
     "minProfit": 0.001,
-    "noOfTrades": 1,
+    "paperTrading": true,
+    "noOfTrades": 5,
     "maxBalance": 100000,
     "riskFactor": 1
 }

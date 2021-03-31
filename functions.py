@@ -40,8 +40,8 @@ def tickerHasPrice(ticker):
 
 
 def getBuyPrice(ticker):
-    return ticker['last']  # ask
+    return ticker['ask']  # ask
 
 
 def getSellPrice(ticker):
-    return ticker['last']  # bid
+    return ticker['bid']  # bid
