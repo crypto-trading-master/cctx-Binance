@@ -11,9 +11,11 @@ def on_close(ws):
 
 if __name__ == "__main__":
 
-    pair = 'BTCUSDT'
+    pair = 'btcusdt'
 
-    socketURL = f'wss://stream.binance.com:9443/ws/{pair}@bookTicker'
+    # socketURL = f'wss://stream.binance.com:9443/ws/{pair}@kline_1m'
+
+    socketURL = 'wss://stream.binance.com:9443/ws/!ticker@arr'
 
     print(socketURL)
 
