@@ -12,7 +12,6 @@ def process_message(msg):
 
 def run():
 
-
     client = Client()
 
     bm = BinanceSocketManager(client)
