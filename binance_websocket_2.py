@@ -21,6 +21,7 @@ def run():
 
     bm = BinanceSocketManager(client)
     conn_key = bm.start_ticker_socket(process_message)
+    # conn_key = bm.start_multiplex_socket(['!bookTicker'], process_message)
     bm.start()
 
 
