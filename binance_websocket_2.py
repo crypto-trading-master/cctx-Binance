@@ -8,15 +8,19 @@ from pprint import pprint
 def process_message(msg):
     # print("message type: {}".format(msg['e']))
     pprint(msg)
+    print("Number of pairs", len(msg))
+    bm.stop_socket(conn_key)
+    reactor.stop()
 
 
 def run():
 
     client = Client()
 
+    global bm, conn_key
+
     bm = BinanceSocketManager(client)
-    # bm.start_trade_socket('BTCUSDT', process_message)
-    bm.start_ticker_socket(process_message)
+    conn_key = bm.start_ticker_socket(process_message)
     bm.start()
 
 
